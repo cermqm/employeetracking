@@ -1,5 +1,6 @@
 Select * from employeeTracker_db.edepartment;
 Select * from employeeTracker_db.erole;
+Select * from employeeTracker_db.employee;
 
 
 
