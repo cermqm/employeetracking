@@ -1,6 +1,15 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var $ = jQuery = require('jquery');
+const Promise = require('promise')
+
+
+var deferred = require('deferred');
+
 const { restoreDefaultPrompts } = require("inquirer");
+
+var employeebymanagersarray = [];
+var managerarray = [];
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -21,7 +30,11 @@ connection.connect(function(err) {
     mainMenu();
 });
 
+
+createmarray();
+
 function mainMenu() {
+    // createmarray();
     inquirer
         .prompt({
             name: "action",
@@ -44,15 +57,12 @@ function mainMenu() {
                 case "Add Departments":
                     addDepartments();
                     break;
-
                 case "Add Roles":
                     addRoles();
                     break;
-
                 case "Add Employees":
                     addEmployees();
                     break;
-
                 case "View Departments":
                     viewDepartments();
                     break;
@@ -395,23 +405,45 @@ function updateManager() {
 }
 
 function viewEmployeesByManager() {
+    createebmarray();
+};
 
-    managerarray = [];
-    var querymgr = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, erole.title from employee join erole on employee.role_id=erole.id where erole.title='Manager'";
-    connection.query(querymgr, function(err, mgr) {
-        for (let i = 0; i < mgr.length; i++) {
-            managerrecord = { name: mgr[i].first_name + " " + mgr[i].last_name, id: mgr[i].id };
-            managerarray.push(managerrecord);
-        }
+async function createmarray() {
 
-        console.log("managerearray = ", managerarray);
+    await new Promise(resolve => {
+        var querymgr = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, erole.title from employee join erole on employee.role_id=erole.id where erole.title='Manager'";
+        connection.query(querymgr, function(err, mgr) {
+                for (let i = 0; i < mgr.length; i++) {
+                    managerrecord = { name: mgr[i].first_name + " " + mgr[i].last_name, id: mgr[i].id };
+                    managerarray.push(managerrecord);
+                }
+                // console.log("managerearray in createmarray = ", managerarray);
+
+            })
+            // console.log('createmarray resolved')
+        resolve();
+
+        // createebmarray();
+    })
+};
+
+async function createebmarray() {
+
+    // await createmarray();
+
+    employeebymanagersarray = [];
+
+    // managerarray = [{ name: 'Michael Mink', id: 1 }, { name: 'Andrew Mink', id: 5 }, { name: 'Jenni Otte', id: 6 }, { name: 'Allan Otte', id: 7 }];
+
+    await new Promise(resolve => {
 
         for (let i = 0; i < managerarray.length; i++) {
             queryemployeebymanager = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id from employee where employee.manager_id=?";
             var managerarrayid = managerarray[i].id;
-            var employeebymanagersarray = [];
-            console.log("managerarrayid = " + managerarrayid);
             connection.query(queryemployeebymanager, [managerarrayid], function(err, res) {
+
+                // console.log("res = ", res);
+
 
                 if (err) {
                     console.log("")
@@ -421,86 +453,31 @@ function viewEmployeesByManager() {
                     console.log("")
                 }
 
-                console.log("res = ", res);
+                if (res.length > 0) {
 
-                // console.log("i = " + i);
-                // console.log("managerearray = ", managerarray);
-                // console.log("managerarray[i].id = " + managerarray[i].id);
-                // console.log("res[i].id = " + res[i].id);
-                // console.log("res[i].first_name = " + res[i].first_name);
-                // console.log("res[i].last_name = " + res[i].last_name);
-                // console.log("res[i].role_id = " + res[i].role_id);
-                // console.log("res[i].manager_id = " + res[i].manager_id);
-                // console.log("managerarray[i] = " + JSON.stringify(managerarray[i]));
-                console.log("managerarray[i].name = " + managerarray[i].name);
+                    // console.log("i = " + i);
+                    // console.log("managerearray = ", managerarray);
+                    // console.log("managerarray[i].id = " + managerarray[i].id);
+                    // console.log("res[i].id = " + res[i].id);
+                    // console.log("res[i].first_name = " + res[i].first_name);
+                    // console.log("res[i].last_name = " + res[i].last_name);
+                    // console.log("res[i].role_id = " + res[i].role_id);
+                    // console.log("res[i].manager_id = " + res[i].manager_id);
+                    // console.log("managerarray[i] = " + JSON.stringify(managerarray[i]));
+                    // console.log("managerarray[i].name = " + managerarray[i].name);
 
-                employeebymanagerobj = { ID: res[i].id, First_Name: res[i].first_name, Last_Name: res[i].last_name, Role_ID: res[i].role_id, Manager_ID: res[i].manager_id, Manager: managerarray[i].name };
-                employeebymanagersarray.push(employeebymanagerobj);
-                console.log("employeebymanagersarray = ", employeebymanagersarray);
-
+                    for (let z = 0; z < res.length; z++) {
+                        employeebymanagerobj = { ID: res[z].id, First_Name: res[z].first_name, Last_Name: res[z].last_name, Role_ID: res[z].role_id, Manager_ID: res[z].manager_id, Manager: managerarray[i].name };
+                        employeebymanagersarray.push(employeebymanagerobj);
+                    }
+                }
+                console.log("");
+                console.table(employeebymanagersarray);
+                console.log("");
             })
+            console.log("employeebymanagersarray = ", employeebymanagersarray);
         }
-        console.log("");
-        console.table(employeebymanagersarray);
-        console.log("");
         mainMenu();
+        resolve();
     })
-
 }
-
-
-// async function viewEmployeesByManager() {
-
-//     managerarray = [];
-//     var querymgr = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, erole.title from employee join erole on employee.role_id=erole.id where erole.title='Manager'";
-//     await connection.query(querymgr, function(err, mgr) {
-//         for (let i = 0; i < mgr.length; i++) {
-//             managerrecord = { name: mgr[i].first_name + " " + mgr[i].last_name, id: mgr[i].id };
-//             managerarray.push(managerrecord);
-//         }
-
-
-//         console.log("managerearray = ", managerarray);
-
-//         // var employeebymanagersarray = [];
-
-//         for (let i = 0; i < managerarray.length; i++) {
-//             queryemployeebymanager = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id from employee where employee.manager_id=?";
-//             var managerarrayid = managerarray[i].id;
-//             var employeebymanagersarray = [];
-//             // console.log("managerarrayid = " + managerarrayid);
-//             await connection.query(queryemployeebymanager, [managerarrayid], function(err, res) {
-
-//                 if (err) {
-//                     console.log("")
-//                     console.log("****************************************************************");
-//                     console.log("An error occurred! - ", err.sqlMessage);
-//                     console.log("****************************************************************");
-//                     console.log("")
-//                 }
-//                 .then(console.log("res = ", res))
-
-//                 // console.log("i = " + i);
-//                 // console.log("managerearray = ", managerarray);
-//                 // console.log("managerarray[i].id = " + managerarray[i].id);
-//                 // console.log("res[i].id = " + res[i].id);
-//                 // console.log("res[i].first_name = " + res[i].first_name);
-//                 // console.log("res[i].last_name = " + res[i].last_name);
-//                 // console.log("res[i].role_id = " + res[i].role_id);
-//                 // console.log("res[i].manager_id = " + res[i].manager_id);
-//                 // console.log("managerarray[i] = " + JSON.stringify(managerarray[i]));
-//                 console.log("managerarray[i].name = " + managerarray[i].name);
-
-//                 employeebymanagerobj = { ID: res[i].id, First_Name: res[i].first_name, Last_Name: res[i].last_name, Role_ID: res[i].role_id, Manager_ID: res[i].manager_id, Manager: managerarray[i].name };
-//                 employeebymanagersarray.push(employeebymanagerobj);
-//                 console.log("employeebymanagersarray = ", employeebymanagersarray);
-
-//             })
-//         }
-//         console.log("");
-//         console.table(employeebymanagersarray);
-//         console.log("");
-//         mainMenu();
-//     })
-
-// }
