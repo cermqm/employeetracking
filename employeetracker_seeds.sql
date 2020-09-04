@@ -11,7 +11,6 @@ INSERT INTO erole (title, salary, department_id) VALUES ('Nurse', 100000, 4);
 INSERT INTO erole (title, salary, department_id) VALUES ('Consultant', 80000, 3);
 INSERT INTO erole (title, salary, department_id) VALUES ('Analyst', 30000, 2);
 
-
 INSERT INTO employee (first_name, last_name, role_id) VALUES ('Michael', 'Mink', 1);
 INSERT INTO employee (first_name, last_name, role_id) VALUES ('Dalton', 'Mink', 2);
 INSERT INTO employee (first_name, last_name, role_id) VALUES ('Dyelan', 'Mink', 5);
