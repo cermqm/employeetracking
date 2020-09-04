@@ -4,13 +4,13 @@ var $ = jQuery = require('jquery');
 const Promise = require('promise')
 
 
-var deferred = require('deferred');
-
 const { restoreDefaultPrompts } = require("inquirer");
 
+// setup global variables
 var employeebymanagersarray = [];
 var managerarray = [];
 
+// database connection configuration
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -25,16 +25,19 @@ var connection = mysql.createConnection({
     database: "employeeTracker_db"
 });
 
+// Run create Management Array - this is not needed if I can figure out how to run functions async
+
+// connect to database and jump to mainMenu
 connection.connect(function(err) {
     if (err) throw err;
     mainMenu();
 });
 
-
 createmarray();
 
+
+// Main menu for program
 function mainMenu() {
-    // createmarray();
     inquirer
         .prompt({
             name: "action",
@@ -52,6 +55,7 @@ function mainMenu() {
                 "View Employees by Manager"
             ]
         })
+        // Case statement for selection of menu item
         .then(function(answer) {
             switch (answer.action) {
                 case "Add Departments":
@@ -85,7 +89,7 @@ function mainMenu() {
             }
         });
 }
-
+// Add departments function - allows us to create new departments 
 function addDepartments() {
     inquirer
         .prompt({
@@ -116,7 +120,7 @@ function addDepartments() {
             }
         });
 }
-
+// View department function to view the departments in the database
 function viewDepartments() {
     // var querycolumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='employeeTracker_db' AND TABLE_NAME='edepartment'";
     // connection.query(querycolumns, function(err, res) {
@@ -149,6 +153,7 @@ function viewDepartments() {
     });
 };
 
+// Add roles function - to add roles to the database
 function addRoles() {
     inquirer
         .prompt([{
@@ -192,7 +197,7 @@ function addRoles() {
         });
 }
 
-
+// View roles function - to view the roles in the database
 function viewRoles() {
     var query = "Select id, title, salary, department_id from erole";
     connection.query(query, function(err, res) {
@@ -210,6 +215,7 @@ function viewRoles() {
     });
 };
 
+// Add employees function - to add employees to the database
 function addEmployees() {
     inquirer
         .prompt([{
@@ -258,7 +264,7 @@ function addEmployees() {
         });
 }
 
-
+// View employees - to view the employees in the database
 function viewEmployees() {
     var query = "Select id, first_name, last_name, role_id, manager_id from employee";
     connection.query(query, function(err, res) {
@@ -275,7 +281,7 @@ function viewEmployees() {
     });
 };
 
-
+// function update role - this will allow you to update the role for an employee
 function updateRole() {
     var employeesarray = [];
     var rolearray = [];
@@ -340,6 +346,7 @@ function updateRole() {
     })
 }
 
+// Update manager function - to update the manager for an employee
 function updateManager() {
     var employeesarray = [];
     var managerarray = [];
@@ -404,6 +411,7 @@ function updateManager() {
     })
 }
 
+// View employee by manager - this function will allow you to view employees by manager - still needs some work but I ran out of time.
 function viewEmployeesByManager() {
     createebmarray();
 };
