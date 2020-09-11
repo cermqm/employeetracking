@@ -25,4 +25,10 @@ WHERE `TABLE_SCHEMA`='employeeTracker_db'
     
     select * from employee;
     
+    Select erole.id, erole.title, erole.salary, edepartment.name from erole join edepartment on erole.department_id = edepartment.id;
+    
+    
+    Select employee.id, employee.first_name, employee.last_name, erole.title, manager_id from employee join erole on employee.role_id = erole.id;
+
+    
     

@@ -2,7 +2,7 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var $ = jQuery = require('jquery');
 const Promise = require('promise')
-
+var connection = require("./.env/mysqlconnection.js")
 
 const { restoreDefaultPrompts } = require("inquirer");
 
@@ -10,31 +10,30 @@ const { restoreDefaultPrompts } = require("inquirer");
 var employeebymanagersarray = [];
 var managerarray = [];
 
-// database connection configuration
-var connection = mysql.createConnection({
-    host: "localhost",
+// // database connection configuration
+// var connection = mysql.createConnection({
+//     host: "localhost",
 
-    // Your port; if not 3306
-    port: 3306,
+//     // Your port; if not 3306
+//     port: 3306,
 
-    // Your username
-    user: "cermqm",
+//     // Your username
+//     user: "cermqm",
 
-    // Your password
-    password: "cermqm",
-    database: "employeeTracker_db"
-});
+//     // Your password
+//     password: "cermqm",
+//     database: "employeeTracker_db"
+// });
 
 // Run create Management Array - this is not needed if I can figure out how to run functions async
 
-// connect to database and jump to mainMenu
-connection.connect(function(err) {
-    if (err) throw err;
-    mainMenu();
-});
+// // connect to database and jump to mainMenu
+// connection.connect(function(err) {
+//     if (err) throw err;
+//     mainMenu();
+// });
 
-createmarray();
-
+mainMenu();
 
 // Main menu for program
 function mainMenu() {
@@ -51,8 +50,8 @@ function mainMenu() {
                 "View Roles",
                 "View Employees",
                 "Update Role",
-                "Update Manager",
-                "View Employees by Manager"
+                "Update Manager"
+                // "View Employees by Manager"
             ]
         })
         // Case statement for selection of menu item
@@ -83,9 +82,9 @@ function mainMenu() {
                 case "Update Manager":
                     updateManager();
                     break;
-                case "View Employees by Manager":
-                    viewEmployeesByManager();
-                    break;
+                    // case "View Employees by Manager":
+                    //     viewEmployeesByManager();
+                    //     break;
             }
         });
 }
@@ -199,12 +198,13 @@ function addRoles() {
 
 // View roles function - to view the roles in the database
 function viewRoles() {
-    var query = "Select id, title, salary, department_id from erole";
+    var query = "Select erole.id, erole.title, erole.salary, edepartment.name from erole join edepartment on erole.department_id = edepartment.id";
     connection.query(query, function(err, res) {
 
         rolearray = [];
         for (let i = 0; i < res.length; i++) {
-            roleobj = { ID: res[i].id, Title: res[i].title, Salary: res[i].salary, department_id: res[i].department_id }
+            roleobj = { ID: res[i].id, Title: res[i].title, Salary: res[i].salary, department: res[i].name }
+
             rolearray.push(roleobj);
         }
         console.log("");
@@ -266,11 +266,11 @@ function addEmployees() {
 
 // View employees - to view the employees in the database
 function viewEmployees() {
-    var query = "Select id, first_name, last_name, role_id, manager_id from employee";
+    var query = "Select employee.id, employee.first_name, employee.last_name, erole.title, manager_id from employee join erole on employee.role_id = erole.id";
     connection.query(query, function(err, res) {
         employeesarray = [];
         for (let i = 0; i < res.length; i++) {
-            employeeobj = { ID: res[i].id, First_Name: res[i].first_name, Last_Name: res[i].last_name, Role_ID: res[i].role_id, Manager_ID: res[i].manager_id }
+            employeeobj = { ID: res[i].id, First_Name: res[i].first_name, Last_Name: res[i].last_name, Role: res[i].title, Manager_ID: res[i].manager_id }
             employeesarray.push(employeeobj);
         }
         console.log("");
@@ -408,84 +408,5 @@ function updateManager() {
                     }
                 });
         })
-    })
-}
-
-// View employee by manager - this function will allow you to view employees by manager - still needs some work but I ran out of time.
-function viewEmployeesByManager() {
-    createebmarray();
-};
-
-async function createmarray() {
-
-    await new Promise(resolve => {
-        var querymgr = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, erole.title from employee join erole on employee.role_id=erole.id where erole.title='Manager'";
-        connection.query(querymgr, function(err, mgr) {
-                for (let i = 0; i < mgr.length; i++) {
-                    managerrecord = { name: mgr[i].first_name + " " + mgr[i].last_name, id: mgr[i].id };
-                    managerarray.push(managerrecord);
-                }
-                // console.log("managerearray in createmarray = ", managerarray);
-
-            })
-            // console.log('createmarray resolved')
-        resolve();
-
-        // createebmarray();
-    })
-};
-
-async function createebmarray() {
-
-    // await createmarray();
-
-    employeebymanagersarray = [];
-
-    // managerarray = [{ name: 'Michael Mink', id: 1 }, { name: 'Andrew Mink', id: 5 }, { name: 'Jenni Otte', id: 6 }, { name: 'Allan Otte', id: 7 }];
-
-    await new Promise(resolve => {
-
-        for (let i = 0; i < managerarray.length; i++) {
-            queryemployeebymanager = "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id from employee where employee.manager_id=?";
-            var managerarrayid = managerarray[i].id;
-            connection.query(queryemployeebymanager, [managerarrayid], function(err, res) {
-
-                // console.log("res = ", res);
-
-
-                if (err) {
-                    console.log("")
-                    console.log("****************************************************************");
-                    console.log("An error occurred! - ", err.sqlMessage);
-                    console.log("****************************************************************");
-                    console.log("")
-                }
-
-                if (res.length > 0) {
-
-                    // console.log("i = " + i);
-                    // console.log("managerearray = ", managerarray);
-                    // console.log("managerarray[i].id = " + managerarray[i].id);
-                    // console.log("res[i].id = " + res[i].id);
-                    // console.log("res[i].first_name = " + res[i].first_name);
-                    // console.log("res[i].last_name = " + res[i].last_name);
-                    // console.log("res[i].role_id = " + res[i].role_id);
-                    // console.log("res[i].manager_id = " + res[i].manager_id);
-                    // console.log("managerarray[i] = " + JSON.stringify(managerarray[i]));
-                    // console.log("managerarray[i].name = " + managerarray[i].name);
-
-                    for (let z = 0; z < res.length; z++) {
-                        employeebymanagerobj = { ID: res[z].id, First_Name: res[z].first_name, Last_Name: res[z].last_name, Role_ID: res[z].role_id, Manager_ID: res[z].manager_id, Manager: managerarray[i].name };
-                        employeebymanagersarray.push(employeebymanagerobj);
-                    }
-                }
-                console.log("");
-                console.table(employeebymanagersarray);
-                console.log("");
-            })
-            console.log("employeebymanagersarray = ", employeebymanagersarray);
-        }
-        mainMenu();
-        resolve();
     })
 }
