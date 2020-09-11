@@ -8,7 +8,8 @@ License - [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
 * [License](#License)
 * [Contributing](#Contributing)
 * [Tests](#Tests)
-* [Questions](Questions)
+* [Questions](#Questions)
+* [Videos](#Videos)
 
 
 ### - Installation Instructions
@@ -36,4 +37,16 @@ License - [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
 
 [GitHub](https://github.com/cermqm)
 
+### - Videos
 
+Overview - https://github.com/cermqm/employeetracking/raw/master/videos/Untitled_%20Sep%203%2C%202020%2011_22%20PM.mp4
+
+Add Department/View Departments - https://github.com/cermqm/employeetracking/raw/master/videos/Untitled_%20Sep%203%2C%202020%2011_33%20PM.mp4
+
+Add Role/View Role - https://github.com/cermqm/employeetracking/raw/master/videos/Untitled_%20Sep%203%2C%202020%2011_36%20PM.mp4
+
+Add Employee/View Employee - https://github.com/cermqm/employeetracking/raw/master/videos/Untitled_%20Sep%203%2C%202020%2011_38%20PM.mp4
+
+Update Role - https://github.com/cermqm/employeetracking/raw/master/videos/Untitled_%20Sep%203%2C%202020%2011_40%20PM.mp4
+
+Update Manager - https://github.com/cermqm/employeetracking/raw/master/videos/Untitled_%20Sep%203%2C%202020%2011_44%20PM.mp4
